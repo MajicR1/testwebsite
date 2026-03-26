@@ -327,6 +327,24 @@
       color: var(--grey-muted);
     }
 
+    .gallery-figure {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-figure .gallery-item {
+      flex: 1;
+    }
+
+    .gallery-caption {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+      padding: 8px 2px 0;
+    }
+
     /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--grey-line);
@@ -396,10 +414,10 @@
     <p class="section-label">// Overview</p>
     <div class="overview-text">
       <p>
-        Magic FPS is a 5v5 tactical first-person shooter built in Unity. Two teams go head-to-head across custom-designed maps where magic abilities meet tight gunplay. The game emphasises team coordination, strategic ability use, and competitive balance.
+        Magic FPS is a 5v5 tactical first-person shooter built in Unity. Two teams go head-to-head across custom-designed maps where magic abilities meet tight gunplay. The game emphasises team coordination, and strategic ability use.
       </p>
       <p>
-        Add more detail about the project here — what inspired it, how long it took to build, what you learned, any interesting technical challenges you solved.
+        My first love of in gaming was first person shooters. This game was heavily inspired by games like Counter-strike and Valorant. With a standaredized set of utility like Counter-strike but with more interesting choices.
       </p>
     </div>
 
@@ -425,7 +443,10 @@
       </div> -->
 
       <!-- Placeholders — remove once you add real media -->
-      <div class="gallery-item"><div class="gallery-placeholder"><span>Screenshot 1</span></div></div>
+      <div class="gallery-figure">
+        <div class="gallery-item"><img src="images/magicfps_lobby.png" alt="Unity Lobby System"></div>
+        <p class="gallery-caption">Unity Lobby System</p>
+      </div>
       <div class="gallery-item"><div class="gallery-placeholder"><span>Screenshot 2</span></div></div>
       <div class="gallery-item"><div class="gallery-placeholder"><span>GIF / Video</span></div></div>
     </div>
