@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Magic FPS — Justin Von Gartzen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #080808;
+      --white: #f2f2f2;
+      --grey-dark: #111111;
+      --grey-mid: #1e1e1e;
+      --grey-line: #2a2a2a;
+      --grey-muted: #555;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+      background: rgba(8,8,8,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--grey-line);
+    }
+
+    .back-link {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover { color: var(--white); }
+
+    .nav-label {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding-top: 64px;
+      width: 100%;
+      position: relative;
+    }
+
+    .hero-image {
+      width: 100%;
+      max-height: 520px;
+      object-fit: cover;
+      display: block;
+      opacity: 0.85;
+    }
+
+    .hero-placeholder {
+      width: 100%;
+      height: 420px;
+      background: var(--grey-mid);
+      border-bottom: 1px solid var(--grey-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-placeholder span {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 200px;
+      background: linear-gradient(to top, var(--black), transparent);
+      pointer-events: none;
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .game-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 40px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+
+    .game-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+      margin-bottom: 12px;
+    }
+
+    .game-title {
+      font-family: var(--font-display);
+      font-size: clamp(3.5rem, 7vw, 6rem);
+      line-height: 0.95;
+      letter-spacing: 0.02em;
+      margin-bottom: 20px;
+    }
+
+    .game-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: 1px solid var(--grey-line);
+      padding: 5px 12px;
+      color: var(--grey-muted);
+    }
+
+    .game-links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 12px 28px;
+      border: 1px solid var(--white);
+      color: var(--white);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .btn:hover { background: var(--white); color: var(--black); }
+
+    .btn-ghost {
+      border-color: var(--grey-line);
+      color: var(--grey-muted);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--white);
+      color: var(--white);
+      background: transparent;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: var(--grey-line);
+      margin: 48px 0;
+    }
+
+    /* ── OVERVIEW ── */
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+      margin-bottom: 20px;
+    }
+
+    .overview-text {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: #aaa;
+      font-weight: 300;
+      max-width: 720px;
+    }
+
+    .overview-text p + p { margin-top: 16px; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2px;
+      margin-top: 24px;
+    }
+
+    .feature-card {
+      background: var(--grey-dark);
+      border: 1px solid var(--grey-line);
+      padding: 24px;
+    }
+
+    .feature-number {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      color: var(--grey-muted);
+      letter-spacing: 0.15em;
+      margin-bottom: 12px;
+    }
+
+    .feature-title {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 0.82rem;
+      color: #777;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* ── MEDIA GALLERY ── */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+      margin-top: 24px;
+    }
+
+    .gallery-item {
+      aspect-ratio: 16/9;
+      background: var(--grey-mid);
+      border: 1px solid var(--grey-line);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s, opacity 0.3s;
+      opacity: 0.85;
+    }
+
+    .gallery-item:hover img,
+    .gallery-item:hover video { transform: scale(1.03); opacity: 1; }
+
+    .gallery-item iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .gallery-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-placeholder span {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--grey-muted);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--grey-line);
+      padding: 28px 48px;
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--grey-muted);
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .content { padding: 48px 24px 80px; }
+      .game-header { flex-direction: column; }
+      .game-links { align-items: flex-start; flex-direction: row; flex-wrap: wrap; }
+      .gallery { grid-template-columns: 1fr; }
+      footer { padding: 28px 24px; flex-direction: column; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="back-link" href="index.html">← Back to Portfolio</a>
+    <span class="nav-label">Unity — 003</span>
+  </nav>
+
+  <!-- Hero image -->
+  <div class="hero">
+    <img class="hero-image" src="images/boxart1magicfps.jpg" alt="Magic FPS">
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- Header -->
+    <div class="game-header">
+      <div>
+        <p class="game-eyebrow">// Unity — FPS — Multiplayer</p>
+        <h1 class="game-title">Magic FPS</h1>
+        <div class="game-tags">
+          <span class="tag">Unity</span>
+          <span class="tag">C#</span>
+          <span class="tag">FPS</span>
+          <span class="tag">5v5</span>
+          <span class="tag">Multiplayer</span>
+          <span class="tag">3D</span>
+        </div>
+      </div>
+      <div class="game-links">
+        <!-- <a class="btn" href="#" target="_blank">Play Now ↗</a> -->
+        <a class="btn btn-ghost" href="https://github.com/MajicR1" target="_blank">GitHub ↗</a>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Overview -->
+    <p class="section-label">// Overview</p>
+    <div class="overview-text">
+      <p>
+        Magic FPS is a 5v5 tactical first-person shooter built in Unity. Two teams go head-to-head across custom-designed maps where magic abilities meet tight gunplay. The game emphasises team coordination, strategic ability use, and competitive balance.
+      </p>
+      <p>
+        Add more detail about the project here — what inspired it, how long it took to build, what you learned, any interesting technical challenges you solved.
+      </p>
+    </div>
+
+    <div class="divider"></div>
+
+    
+
+    <div class="divider"></div>
+
+    <!-- Media Gallery -->
+    <p class="section-label">// Screenshots & Media</p>
+    <div class="gallery">
+
+      <!-- Add screenshots like this: -->
+      <!-- <div class="gallery-item"><img src="images/magicfps_screen1.jpg" alt="Screenshot 1"></div> -->
+
+      <!-- Add a GIF like this: -->
+      <!-- <div class="gallery-item"><img src="images/magicfps_gameplay.gif" alt="Gameplay GIF"></div> -->
+
+      <!-- Add a YouTube embed like this: -->
+      <!-- <div class="gallery-item" style="aspect-ratio:16/9">
+        <iframe src="https://www.youtube.com/embed/YOUR_VIDEO_ID" allowfullscreen></iframe>
+      </div> -->
+
+      <!-- Placeholders — remove once you add real media -->
+      <div class="gallery-item"><div class="gallery-placeholder"><span>Screenshot 1</span></div></div>
+      <div class="gallery-item"><div class="gallery-placeholder"><span>Screenshot 2</span></div></div>
+      <div class="gallery-item"><div class="gallery-placeholder"><span>GIF / Video</span></div></div>
+    </div>
+
+  </div>
+
+  <footer>
+    <span class="footer-text">© 2025 — Justin Von Gartzen</span>
+    <span class="footer-text">Magic FPS</span>
+  </footer>
+
+</body>
+</html>
